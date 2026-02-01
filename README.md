@@ -124,16 +124,17 @@ Or if installed locally:
 ## Example
 
 ```
-"Read the design system from this file, then generate a login screen
-using the existing components."
+"Read the design system
 ```
 
-The agent will:
-1. Extract colors, typography, and components via `get_local_styles`
-2. Find component sets via `find_nodes`
-3. List available variants via `list_variants`
-4. Create a frame and compose instances with `create_instance`
-5. Position and customize text with `set_position` and `set_text_content`
+The agent will extract colors, typography, and components, etc via `get_local_styles` and create a json reference object 
+
+```
+Generate a login screen
+```
+
+Create a frame and compose instances with `create_instance`
+Position and customize text with `set_position` and `set_text_content`
 
 ## Limitations
 
