@@ -1,0 +1,150 @@
+# figma-compose-mcp
+
+An MCP server that enables AI agents to generate Figma screens using **real linked component instances** from your design system — not visual approximations.
+
+## What it does
+
+1. **Reads your design system** — extracts colors, typography, effects, and design tokens from any Figma file
+2. **Creates real component instances** — uses linked instances from your component library with correct variant selection
+3. **Generates full screens** — composes screens from your actual components with proper positioning, text, and styling
+4. **Sets up prototype interactions** — navigation, overlays, transitions between screens
+
+Every element stays connected to the source design system. Change a component in your kit, and generated screens update automatically.
+
+## Architecture
+
+```
+AI Client (Claude, Cursor, etc.) <-> MCP Server (stdio) <-> WebSocket Bridge <-> Figma Plugin
+```
+
+The MCP server exposes tools via the Model Context Protocol. The Figma plugin executes operations on the canvas through a WebSocket bridge.
+
+## Installation
+
+```bash
+npm install figma-compose-mcp
+```
+
+Or clone and run directly:
+
+```bash
+git clone https://github.com/Through-Reflection/figma-compose-mcp.git
+cd figma-compose-mcp
+npm install
+npm start
+```
+
+## Setup
+
+### 1. Install the Figma plugin
+
+- Open Figma Desktop
+- Go to **Plugins -> Development -> Import plugin from manifest**
+- Select `plugin/manifest.json` from this project
+
+### 2. Configure your MCP client
+
+Add to your MCP configuration (e.g., Claude Desktop, Cursor, VS Code):
+
+```json
+{
+  "mcpServers": {
+    "figma-compose": {
+      "command": "npx",
+      "args": ["figma-compose-mcp"]
+    }
+  }
+}
+```
+
+Or if installed locally:
+
+```json
+{
+  "mcpServers": {
+    "figma-compose": {
+      "command": "tsx",
+      "args": ["server.ts"],
+      "cwd": "/path/to/figma-compose-mcp"
+    }
+  }
+}
+```
+
+### 3. Connect
+
+1. Open a Figma document with a design system
+2. Run the plugin: **Plugins -> Development -> figma-compose-mcp**
+3. Start prompting your AI agent
+
+## Tools
+
+### Design System Reading
+
+| Tool | Description |
+|------|-------------|
+| `get_local_styles` | Extract colors, typography, and effects from the Figma file |
+| `get_local_variables` | Get design tokens (variables) with mode support |
+| `list_pages` | List all pages in the file |
+| `find_nodes` | Find nodes by type and/or name |
+| `get_node_info` | Get dimensions, visibility, and component info for any node |
+
+### Component Composition
+
+| Tool | Description |
+|------|-------------|
+| `create_instance` | Create a linked instance of a component with variant selection |
+| `list_variants` | List variant axes and options for a component set |
+| `swap_component` | Swap an instance to a different source component |
+
+### Screen Building
+
+| Tool | Description |
+|------|-------------|
+| `create_frame` | Create a frame with dimensions and position |
+| `add_text` | Add text with font, size, and position |
+| `set_position` | Move any node to specific coordinates |
+| `resize_node` | Resize any node |
+| `group_nodes` | Group nodes together |
+| `set_fill` | Apply fill colors |
+| `set_properties` | Bulk-set layout, styling, and visibility properties |
+
+### Prototyping
+
+| Tool | Description |
+|------|-------------|
+| `set_reactions` | Set prototype interactions (click, hover, navigation, overlays, transitions) |
+
+### Export
+
+| Tool | Description |
+|------|-------------|
+| `export_node` | Export any node as PNG, SVG, JPG, or PDF |
+
+## Example
+
+```
+"Read the design system from this file, then generate a login screen
+using the existing components."
+```
+
+The agent will:
+1. Extract colors, typography, and components via `get_local_styles`
+2. Find component sets via `find_nodes`
+3. List available variants via `list_variants`
+4. Create a frame and compose instances with `create_instance`
+5. Position and customize text with `set_position` and `set_text_content`
+
+## Limitations
+
+- **Font loading** — some fonts may not be available in the plugin environment; Inter works as a fallback
+- **Auto-layout** — components with hug-content sizing don't stretch to arbitrary dimensions
+- **Plugin must be running** — the Figma Desktop plugin must be open with WebSocket connected
+
+## Credits
+
+Built on top of [Figma MCP Write Bridge](https://github.com/firasmj/Figma-MCP-Write-Bridge) by [@firasmj](https://github.com/firasmj).
+
+## License
+
+MIT — see [LICENSE](LICENSE) for details.

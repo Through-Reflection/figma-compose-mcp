@@ -1,0 +1,59 @@
+{
+  "name": "figma-compose-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for AI-driven Figma screen generation using real design system components",
+  "type": "module",
+  "private": false,
+  "author": "Through Reflection <chase.bullock@throughreflection.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Through-Reflection/figma-compose-mcp.git"
+  },
+  "keywords": [
+    "figma",
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "design-system",
+    "design-automation",
+    "figma-plugin",
+    "component-instances",
+    "design-tokens",
+    "screen-generation"
+  ],
+  "bugs": {
+    "url": "https://github.com/Through-Reflection/figma-compose-mcp/issues"
+  },
+  "homepage": "https://github.com/Through-Reflection/figma-compose-mcp#readme",
+  "main": "dist/server.js",
+  "types": "dist/server.d.ts",
+  "bin": {
+    "figma-compose-mcp": "dist/server.js"
+  },
+  "files": [
+    "dist/",
+    "plugin/",
+    "README.md",
+    "SCREEN-GENERATION.md",
+    "COMPONENT-INSTANCE-WORKFLOW.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx server.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.5",
+    "ws": "^8.17.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.3"
+  }
+}

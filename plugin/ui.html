@@ -1,0 +1,32 @@
+<!doctype html>
+<meta charset="utf-8" />
+<div id="status" style="font-family:sans-serif;font-size:12px;padding:8px;color:#666;">Connecting...</div>
+<script>
+  let ws;
+  function connect() {
+    ws = new WebSocket("ws://127.0.0.1:3055");
+    ws.onopen = () => {
+      document.getElementById("status").textContent = "Bridge connected";
+      document.getElementById("status").style.color = "#16a34a";
+      ws.send(JSON.stringify({ hello: "from-plugin-ui" }));
+    };
+    ws.onmessage = (ev) => {
+      try {
+        const msg = JSON.parse(ev.data);
+        parent.postMessage({ pluginMessage: msg }, "*");
+      } catch (e) {
+        console.error("Bad WS message", e);
+      }
+    };
+    ws.onclose = () => {
+      // simple retry loop
+      setTimeout(connect, 1000);
+    };
+  }
+  onmessage = (ev) => {
+    if (ev.data && ev.data.pluginMessage && ws && ws.readyState === 1) {
+      ws.send(JSON.stringify(ev.data.pluginMessage));
+    }
+  };
+  connect();
+</script>
