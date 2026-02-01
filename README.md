@@ -21,17 +21,16 @@ The MCP server exposes tools via the Model Context Protocol. The Figma plugin ex
 
 ## Installation
 
+No install required — run directly with npx:
+
 ```bash
-npm install figma-compose-mcp
+npx figma-compose-mcp
 ```
 
-Or clone and run directly:
+Or install globally:
 
 ```bash
-git clone https://github.com/Through-Reflection/figma-compose-mcp.git
-cd figma-compose-mcp
-npm install
-npm start
+npm install -g figma-compose-mcp
 ```
 
 ## Setup
@@ -52,20 +51,6 @@ Add to your MCP configuration (e.g., Claude Desktop, Cursor, VS Code):
     "figma-compose": {
       "command": "npx",
       "args": ["figma-compose-mcp"]
-    }
-  }
-}
-```
-
-Or if installed locally:
-
-```json
-{
-  "mcpServers": {
-    "figma-compose": {
-      "command": "tsx",
-      "args": ["server.ts"],
-      "cwd": "/path/to/figma-compose-mcp"
     }
   }
 }
