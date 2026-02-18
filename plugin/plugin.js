@@ -1,5 +1,6 @@
 // Show UI (hidden) so we can use Web APIs (WebSocket in ui.html)
 figma.showUI(__html__, { visible: true, width: 200, height: 40 });
+figma.skipInvisibleInstanceChildren = true;
 
 // ---------- Bridge ----------
 figma.ui.onmessage = async (msg) => {
@@ -26,6 +27,26 @@ function getNode(id) {
   const n = figma.getNodeById(id);
   if (!n) throw new Error("Node not found: " + id);
   return n;
+}
+function getParent(parentId) {
+  if (!parentId) return page();
+  const p = getNode(parentId);
+  if (!("appendChild" in p)) throw new Error("Node " + parentId + " cannot have children");
+  return p;
+}
+async function resolveComponent(componentId, componentKey) {
+  if (componentKey) {
+    try {
+      return await figma.importComponentByKeyAsync(componentKey);
+    } catch (e) {
+      try {
+        return await figma.importComponentSetByKeyAsync(componentKey);
+      } catch (e2) {
+        throw new Error("Failed to import component by key: " + componentKey);
+      }
+    }
+  }
+  return getNode(componentId);
 }
 function assertFills(n) {
   if (!("fills" in n)) throw new Error("Node does not support fills");
@@ -67,6 +88,8 @@ async function handleAction(action, input) {
     case "rotate_node": return rotateNode(input);
     case "set_position": return setPosition(input);
     case "group_nodes": return groupNodes(input);
+    case "append_child": return appendChild(input);
+    case "insert_child": return insertChild(input);
     case "ungroup": return ungroup(input);
 
     // Styling
@@ -91,11 +114,13 @@ async function handleAction(action, input) {
 
     // Components / booleans
     case "create_component": return createComponent(input);
-    case "create_instance": return createInstance(input);
-    case "list_variants": return listVariants(input);
+    case "create_instance": return await createInstance(input);
+    case "list_variants": return await listVariants(input);
     case "detach_instance": return detachInstance(input);
     case "boolean_op": return booleanOp(input);
-    case "swap_component": return swapComponent(input);
+    case "swap_component": return await swapComponent(input);
+    case "get_instance_properties": return getInstanceProperties(input);
+    case "set_instance_properties": return await setInstanceProperties(input);
 
     // Prototype interactions
     case "set_reactions": return await setReactions(input);
@@ -104,7 +129,12 @@ async function handleAction(action, input) {
     case "get_local_styles": return getLocalStyles(input);
     case "get_local_variables": return getLocalVariables(input);
 
+    // Text search / page clear
+    case "find_text_nodes": return findTextNodes();
+    case "clear_page": return clearPage();
+
     // Info
+    case "get_file_key": return getFileKey();
     case "get_node_info": return getNodeInfo(input);
 
     // Export / data / generic
@@ -119,61 +149,61 @@ async function handleAction(action, input) {
 }
 
 // ---------- Create ----------
-function createFrame({ name = "Frame", width = 800, height = 600, x = 0, y = 0 }) {
+function createFrame({ name = "Frame", width = 800, height = 600, x = 0, y = 0, parentId }) {
   const f = figma.createFrame();
   f.name = name; f.resize(width, height); f.x = x; f.y = y;
-  page().appendChild(f);
+  getParent(parentId).appendChild(f);
   return { nodeId: f.id, type: f.type, name: f.name, width, height };
 }
-function createRectangle({ width, height, x = 0, y = 0, cornerRadius, hex }) {
+function createRectangle({ width, height, x = 0, y = 0, cornerRadius, hex, parentId }) {
   const r = figma.createRectangle(); r.resize(width, height);
   if (typeof cornerRadius === "number") r.cornerRadius = cornerRadius;
   if (hex) r.fills = [{ type: "SOLID", color: hexToRGB(hex) }];
-  r.x = x; r.y = y; page().appendChild(r);
+  r.x = x; r.y = y; getParent(parentId).appendChild(r);
   return { nodeId: r.id, type: r.type };
 }
-function createEllipse({ width, height, x = 0, y = 0, hex }) {
+function createEllipse({ width, height, x = 0, y = 0, hex, parentId }) {
   const e = figma.createEllipse(); e.resize(width, height);
   if (hex) e.fills = [{ type: "SOLID", color: hexToRGB(hex) }];
-  e.x = x; e.y = y; page().appendChild(e);
+  e.x = x; e.y = y; getParent(parentId).appendChild(e);
   return { nodeId: e.id, type: e.type };
 }
-function createLine({ x = 0, y = 0, length, rotation = 0, strokeHex = "#111827", strokeWeight = 1 }) {
+function createLine({ x = 0, y = 0, length, rotation = 0, strokeHex = "#111827", strokeWeight = 1, parentId }) {
   const l = figma.createLine();
   l.x = x; l.y = y; l.rotation = rotation;
   l.strokes = [{ type: "SOLID", color: hexToRGB(strokeHex) }];
   l.strokeWeight = strokeWeight;
   // Figma line length controlled via vector network — easiest: resize in x.
   l.resize(length, 0);
-  page().appendChild(l);
+  getParent(parentId).appendChild(l);
   return { nodeId: l.id, type: l.type };
 }
-function createPolygon({ sides, width, height, x = 0, y = 0, hex }) {
+function createPolygon({ sides, width, height, x = 0, y = 0, hex, parentId }) {
   const p = figma.createPolygon(); p.pointCount = sides; p.resize(width, height);
   if (hex) p.fills = [{ type: "SOLID", color: hexToRGB(hex) }];
-  p.x = x; p.y = y; page().appendChild(p);
+  p.x = x; p.y = y; getParent(parentId).appendChild(p);
   return { nodeId: p.id, type: p.type };
 }
-function createStar({ points, width, height, x = 0, y = 0, hex }) {
+function createStar({ points, width, height, x = 0, y = 0, hex, parentId }) {
   const s = figma.createStar(); s.pointCount = points; s.resize(width, height);
   if (hex) s.fills = [{ type: "SOLID", color: hexToRGB(hex) }];
-  s.x = x; s.y = y; page().appendChild(s);
+  s.x = x; s.y = y; getParent(parentId).appendChild(s);
   return { nodeId: s.id, type: s.type };
 }
-async function addText({ text, x = 0, y = 0, fontFamily = "Inter", fontStyle = "Regular", fontSize = 32 }) {
+async function addText({ text, x = 0, y = 0, fontFamily = "Inter", fontStyle = "Regular", fontSize = 32, parentId }) {
   await figma.loadFontAsync({ family: fontFamily, style: fontStyle });
   const t = figma.createText();
   t.characters = text; t.fontName = { family: fontFamily, style: fontStyle };
   if (fontSize) t.fontSize = fontSize;
-  t.x = x; t.y = y; page().appendChild(t);
+  t.x = x; t.y = y; getParent(parentId).appendChild(t);
   return { nodeId: t.id, type: t.type, text: t.characters };
 }
-function placeImageBase64({ width, height, x = 0, y = 0, base64 }) {
+function placeImageBase64({ width, height, x = 0, y = 0, base64, parentId }) {
   const bytes = base64ToUint8Array(base64);
   const image = figma.createImage(bytes);
   const r = figma.createRectangle(); r.resize(width, height); r.x = x; r.y = y;
   r.fills = [{ type: "IMAGE", imageHash: image.hash, scaleMode: "FILL" }];
-  page().appendChild(r);
+  getParent(parentId).appendChild(r);
   return { nodeId: r.id, type: r.type };
 }
 
@@ -184,11 +214,17 @@ function listPages() {
 function findNodes({ type, nameContains, within }) {
   let scope = within ? getNode(within) : page();
   if (!("findAll" in scope)) throw new Error("Invalid 'within' scope");
-  const nodes = scope.findAll(n => {
-    const typeOk = type ? n.type === type : true;
-    const nameOk = nameContains ? (("name" in n) && String(n.name).toLowerCase().includes(nameContains.toLowerCase())) : true;
-    return typeOk && nameOk;
-  });
+  // Use findAllWithCriteria for faster type-only searches
+  let nodes;
+  if (type && !nameContains && "findAllWithCriteria" in scope) {
+    nodes = scope.findAllWithCriteria({ types: [type] });
+  } else {
+    nodes = scope.findAll(n => {
+      const typeOk = type ? n.type === type : true;
+      const nameOk = nameContains ? (("name" in n) && String(n.name).toLowerCase().includes(nameContains.toLowerCase())) : true;
+      return typeOk && nameOk;
+    });
+  }
   return nodes.map(n => ({ id: n.id, type: n.type, name: "name" in n ? n.name : undefined }));
 }
 function selectNodes({ nodeIds }) {
@@ -229,6 +265,30 @@ function groupNodes({ nodeIds, name = "Group" }) {
   if (nodes.length < 2) throw new Error("Need 2+ nodes");
   const parent = nodes[0].parent || page();
   const g = figma.group(nodes, parent); g.name = name; return { nodeId: g.id, type: g.type };
+}
+function appendChild({ nodeId, parentId }) {
+  const node = getNode(nodeId);
+  const parent = getNode(parentId);
+  if (!("appendChild" in parent)) throw new Error("Target node cannot have children");
+  parent.appendChild(node);
+  return { nodeId: node.id, parentId: parent.id };
+}
+function insertChild({ nodeId, parentId, index }) {
+  const node = getNode(nodeId);
+  const parent = getNode(parentId);
+  if (!("insertChild" in parent)) throw new Error("Target node cannot have children");
+  const i = Math.max(0, Math.min(index, parent.children.length));
+  parent.insertChild(i, node);
+  return { nodeId: node.id, parentId: parent.id, index: i };
+}
+function findTextNodes() {
+  const texts = page().findAllWithCriteria({ types: ["TEXT"] });
+  return texts.map(t => ({ nodeId: t.id, name: t.name, text: t.characters }));
+}
+function clearPage() {
+  const children = [...page().children];
+  for (const c of children) c.remove();
+  return { cleared: children.length };
 }
 function ungroup({ groupId }) {
   const g = getNode(groupId);
@@ -372,17 +432,17 @@ function setTextColor({ nodeId, hex, opacity }) {
 }
 
 // ---------- Components & Boolean ----------
-function createComponent({ name = "Component", fromNodeIds }) {
+function createComponent({ name = "Component", fromNodeIds, parentId }) {
   const c = figma.createComponent(); c.name = name;
-  page().appendChild(c);
+  getParent(parentId).appendChild(c);
   if (Array.isArray(fromNodeIds) && fromNodeIds.length) {
     const nodes = fromNodeIds.map(getNode);
     for (const n of nodes) c.appendChild(n);
   }
   return { nodeId: c.id, type: c.type };
 }
-function createInstance({ componentId, variantProperties, x = 0, y = 0 }) {
-  const node = getNode(componentId);
+async function createInstance({ componentId, componentKey, variantProperties, x = 0, y = 0, parentId }) {
+  const node = await resolveComponent(componentId, componentKey);
   let component;
 
   if (node.type === "COMPONENT_SET") {
@@ -418,11 +478,11 @@ function createInstance({ componentId, variantProperties, x = 0, y = 0 }) {
   const inst = component.createInstance();
   inst.x = x;
   inst.y = y;
-  page().appendChild(inst);
-  return { nodeId: inst.id, type: inst.type, componentName: component.name };
+  getParent(parentId).appendChild(inst);
+  return { nodeId: inst.id, type: inst.type, componentName: component.name, componentKey: component.key };
 }
-function listVariants({ componentSetId, limit = 50 }) {
-  const node = getNode(componentSetId);
+async function listVariants({ componentSetId, componentSetKey, limit = 50 }) {
+  const node = await resolveComponent(componentSetId, componentSetKey);
   if (node.type !== "COMPONENT_SET") throw new Error("Not a COMPONENT_SET (got " + node.type + ")");
   // Extract variant group properties (axes and their possible values)
   const axes = node.variantGroupProperties || {};
@@ -434,8 +494,8 @@ function listVariants({ componentSetId, limit = 50 }) {
   const variants = node.children
     .filter(c => c.type === "COMPONENT")
     .slice(0, limit)
-    .map(c => ({ id: c.id, name: c.name }));
-  return { axes: variantAxes, variants, total: node.children.filter(c => c.type === "COMPONENT").length };
+    .map(c => ({ id: c.id, name: c.name, key: c.key }));
+  return { key: node.key, axes: variantAxes, variants, total: node.children.filter(c => c.type === "COMPONENT").length };
 }
 function detachInstance({ nodeId }) {
   const n = getNode(nodeId);
@@ -445,22 +505,29 @@ function detachInstance({ nodeId }) {
   }
   throw new Error("Node is not an instance");
 }
+function getFileKey() {
+  const key = figma.fileKey || null;
+  const fileName = figma.root ? figma.root.name : null;
+  return { fileKey: key, fileName: fileName };
+}
 function getNodeInfo({ nodeId }) {
   const n = getNode(nodeId);
   const info = { nodeId: n.id, type: n.type, name: n.name, visible: n.visible, opacity: n.opacity, width: n.width, height: n.height };
   if (n.type === "INSTANCE" && n.mainComponent) {
     info.mainComponentId = n.mainComponent.id;
     info.mainComponentName = n.mainComponent.name;
+    info.mainComponentKey = n.mainComponent.key;
+    info.remote = n.mainComponent.remote;
   }
   return info;
 }
 
-function swapComponent({ nodeId, componentId }) {
+async function swapComponent({ nodeId, componentId, componentKey }) {
   const instance = getNode(nodeId);
   if (instance.type !== "INSTANCE") {
     throw new Error("Node is not an INSTANCE (got " + instance.type + ")");
   }
-  const target = getNode(componentId);
+  const target = await resolveComponent(componentId, componentKey);
   if (target.type === "COMPONENT") {
     instance.swapComponent(target);
   } else if (target.type === "COMPONENT_SET") {
@@ -470,6 +537,24 @@ function swapComponent({ nodeId, componentId }) {
     throw new Error("Target is not a COMPONENT or COMPONENT_SET (got " + target.type + ")");
   }
   return { nodeId: instance.id, swappedTo: instance.mainComponent ? instance.mainComponent.name : "unknown" };
+}
+
+function getInstanceProperties({ nodeId }) {
+  const n = getNode(nodeId);
+  if (n.type !== "INSTANCE") throw new Error("Not an INSTANCE (got " + n.type + ")");
+  const props = n.componentProperties;
+  const result = {};
+  for (const [key, prop] of Object.entries(props)) {
+    result[key] = { type: prop.type, value: prop.value };
+    if (prop.preferredValues) result[key].preferredValues = prop.preferredValues;
+  }
+  return result;
+}
+async function setInstanceProperties({ nodeId, properties }) {
+  const n = getNode(nodeId);
+  if (n.type !== "INSTANCE") throw new Error("Not an INSTANCE (got " + n.type + ")");
+  n.setProperties(properties);
+  return { nodeId, set: Object.keys(properties) };
 }
 
 function booleanOp({ op, nodeIds, name = "Boolean" }) {
@@ -599,11 +684,12 @@ function setProperties({ nodeId, props }) {
   // Whitelisted scalar props (expand as needed)
   const allowed = [
     "x","y","rotation","opacity","visible","locked",
-    "layoutAlign","layoutGrow",
+    "layoutAlign","layoutGrow","layoutSizingHorizontal","layoutSizingVertical",
     "fills","strokes","strokeWeight","strokeAlign","dashPattern","blendMode",
     "itemSpacing","paddingTop","paddingRight","paddingBottom","paddingLeft",
     "primaryAxisAlignItems","counterAxisAlignItems","layoutMode",
     "primaryAxisSizingMode","counterAxisSizingMode","layoutWrap","counterAxisSpacing",
+    "clipsContent","overflowDirection",
     "textAlignHorizontal","textAlignVertical"
   ];
   for (const k of Object.keys(props || {})) {

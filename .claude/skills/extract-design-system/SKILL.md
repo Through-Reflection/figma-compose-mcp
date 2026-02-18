@@ -1,10 +1,15 @@
-# Design System Extraction — Agent Instructions
+---
+name: extract-design-system
+description: Extract a structured design system reference (colors, typography, tokens, components) from a Figma file into JSON
+argument-hint: "[figma file description or specific components to extract]"
+allowed-tools: Bash, Read, Write, Grep, Glob, mcp__figma__get_screenshot, mcp__figma__get_design_context, mcp__figma__get_metadata
+---
 
-## Overview
+# Design System Extraction
 
-Before generating screens, the agent must extract a structured design system reference from the Figma file. This document describes how to systematically scan a design kit and produce a JSON file containing color tokens, typography scales, shape values, elevation specs, and component IDs with their variant axes.
+Extract a structured design system reference from the Figma file and produce a JSON file containing color tokens, typography scales, shape values, elevation specs, and component IDs with their variant axes.
 
-The output is a single JSON file (e.g., `M3-DESIGN-SYSTEM.json`) that serves as the agent's reference when composing screens.
+**User request:** $ARGUMENTS
 
 ## Prerequisites
 
@@ -174,68 +179,15 @@ Combine everything into a single structured file:
     "date": "2026-02-01"
   },
   "colors": {
-    "light": {
-      "primary": "#6750a4",
-      "onPrimary": "#ffffff",
-      "primaryContainer": "#eaddff",
-      "surface": "#fef7ff",
-      "onSurface": "#1d1b20",
-      "onSurfaceVariant": "#49454f"
-    },
-    "dark": {
-      "primary": "#d0bcff",
-      "onPrimary": "#381e72",
-      "surface": "#141218",
-      "onSurface": "#e6e0e9"
-    }
+    "light": { "primary": "#6750a4", "onPrimary": "#ffffff", "surface": "#fef7ff" },
+    "dark": { "primary": "#d0bcff", "onPrimary": "#381e72", "surface": "#141218" }
   },
   "typography": {
     "displayLarge": { "fontSize": 57, "lineHeight": 64, "fontWeight": 400 },
-    "headlineMedium": { "fontSize": 28, "lineHeight": 36, "fontWeight": 400 },
-    "bodyMedium": { "fontSize": 14, "lineHeight": 20, "fontWeight": 400 },
-    "labelLarge": { "fontSize": 14, "lineHeight": 20, "fontWeight": 500 }
+    "bodyMedium": { "fontSize": 14, "lineHeight": 20, "fontWeight": 400 }
   },
-  "shape": {
-    "none": 0,
-    "extraSmall": 4,
-    "small": 8,
-    "medium": 12,
-    "large": 16,
-    "extraLarge": 28,
-    "full": 9999
-  },
-  "components": {
-    "buttons": {
-      "componentSets": [
-        {
-          "name": "Button",
-          "id": "57994:2227",
-          "axes": {
-            "Style": ["Filled", "Outlined", "Text", "Elevated", "Tonal"],
-            "State": ["Enabled", "Disabled", "Pressed", "Focused", "Hovered"]
-          }
-        }
-      ]
-    },
-    "navigation": {
-      "componentSets": [
-        {
-          "name": "Navigation Bar",
-          "id": "58016:37236",
-          "axes": {
-            "Items count": ["2", "3", "4", "5"],
-            "Arrangement": ["Vertical items", "Horizontal items"]
-          },
-          "notes": "Use 'Vertical items' for phone (412px), 'Horizontal items' for tablet (840px+)"
-        }
-      ]
-    },
-    "dividers": {
-      "components": [
-        { "name": "Divider", "id": "58034:21036", "type": "COMPONENT", "notes": "Not a set — use ID directly without variantProperties" }
-      ]
-    }
-  }
+  "shape": { "none": 0, "extraSmall": 4, "small": 8, "medium": 12, "large": 16, "extraLarge": 28, "full": 9999 },
+  "components": { }
 }
 ```
 
@@ -268,19 +220,16 @@ Include a `notes` field for any component with non-obvious behavior.
 Component node IDs are specific to the Figma file. If the design kit is updated or duplicated, IDs will change. Component **keys** are more stable — they persist if the library is republished.
 
 - When working with external/shared libraries, prefer using `componentKey` / `componentSetKey` over ID-based parameters
-- IDs change if the design kit is duplicated; keys persist if the library is republished
 - Components with `remote: true` are confirmed importable from external libraries
 - For local components, the key only works cross-file if the file is published as a team library
 
 Before generating screens with a previously extracted JSON:
-
 1. Spot-check a few component IDs with `list_variants` to confirm they still resolve
 2. If any fail, re-extract the affected category
 
-### Rule 5 (new): Check published status during extraction
+### Rule 5: Check published status during extraction
 
 During extraction, verify that components are published by checking that `.key` exists and is non-empty:
-
 - Components with `remote: true` are confirmed importable from external libraries
 - For local components, note that the key only works if the file is published as a team library
 - Record a `published` field based on whether `remote` is true or the key was successfully verified
@@ -288,7 +237,6 @@ During extraction, verify that components are published by checking that `.key` 
 ### Rule 6: Extract only what you need
 
 A full extraction of a large design kit takes many API calls. For a focused project:
-
 1. Start with the components needed for your first screen
 2. Extract additional components as new screens require them
 3. Incrementally build the JSON reference

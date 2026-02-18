@@ -72,27 +72,34 @@ Add to your MCP configuration (e.g., Claude Desktop, Cursor, VS Code):
 | `get_local_variables` | Get design tokens (variables) with mode support |
 | `list_pages` | List all pages in the file |
 | `find_nodes` | Find nodes by type and/or name |
+| `find_text_nodes` | Return all text nodes on the current page with content |
 | `get_node_info` | Get dimensions, visibility, and component info for any node |
 
 ### Component Composition
 
 | Tool | Description |
 |------|-------------|
-| `create_instance` | Create a linked instance of a component with variant selection |
+| `create_instance` | Create a linked instance with variant selection and optional `parentId` |
 | `list_variants` | List variant axes and options for a component set |
 | `swap_component` | Swap an instance to a different source component |
+| `get_instance_properties` | Read exposed component properties (TEXT, BOOLEAN, INSTANCE_SWAP) |
+| `set_instance_properties` | Override component properties declaratively (labels, toggles, icon swaps) |
 
 ### Screen Building
 
 | Tool | Description |
 |------|-------------|
-| `create_frame` | Create a frame with dimensions and position |
-| `add_text` | Add text with font, size, and position |
+| `create_frame` | Create a frame with dimensions, position, and optional `parentId` |
+| `add_text` | Add text with font, size, position, and optional `parentId` |
+| `rectangle` | Create a rectangle with optional fill, corner radius, and `parentId` |
 | `set_position` | Move any node to specific coordinates |
 | `resize_node` | Resize any node |
 | `group_nodes` | Group nodes together |
+| `append_child` | Move a node into a parent frame or group |
+| `insert_child` | Insert a node at a specific z-index position in a parent |
 | `set_fill` | Apply fill colors |
-| `set_properties` | Bulk-set layout, styling, and visibility properties |
+| `set_properties` | Bulk-set layout, styling, visibility, clipsContent, overflowDirection, layoutSizing |
+| `clear_page` | Remove all nodes from the current page |
 
 ### Prototyping
 

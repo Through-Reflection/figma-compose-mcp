@@ -111,7 +111,8 @@ registerTool(
     width: z.number().positive(),
     height: z.number().positive(),
     x: z.number().optional(),
-    y: z.number().optional()
+    y: z.number().optional(),
+    parentId: z.string().optional().describe("Optional parent frame/group ID. If omitted, appends to page.")
   },
   "Create a frame with width/height and optional name/position.",
   "create_frame"
@@ -125,7 +126,8 @@ registerTool(
     y: z.number().optional(),
     fontFamily: z.string().optional().default("Inter"),
     fontStyle: z.string().optional().default("Regular"),
-    fontSize: z.number().optional().default(32)
+    fontSize: z.number().optional().default(32),
+    parentId: z.string().optional().describe("Optional parent frame/group ID. If omitted, appends to page.")
   },
   "Add a text node (loads font) at optional position.",
   "add_text"
@@ -139,7 +141,8 @@ registerTool(
     hex: z.string().optional(),
     x: z.number().optional(),
     y: z.number().optional(),
-    cornerRadius: z.number().optional()
+    cornerRadius: z.number().optional(),
+    parentId: z.string().optional().describe("Optional parent frame/group ID. If omitted, appends to page.")
   },
   "Create a rectangle with optional fill color/position/cornerRadius.",
   "create_rectangle"
@@ -164,6 +167,27 @@ registerTool(
   },
   "Group the given nodes into a single group.",
   "group_nodes"
+);
+
+registerTool(
+  "append_child",
+  {
+    nodeId: z.string().describe("ID of the node to move"),
+    parentId: z.string().describe("ID of the target parent frame or group")
+  },
+  "Move a node into a parent frame or group. The node becomes a child of the target.",
+  "append_child"
+);
+
+registerTool(
+  "insert_child",
+  {
+    nodeId: z.string().describe("ID of the node to move"),
+    parentId: z.string().describe("ID of the target parent frame or group"),
+    index: z.number().int().min(0).describe("Position in the parent's children list (0 = bottom/back, higher = front)")
+  },
+  "Insert a node into a parent at a specific index for z-order control. Index 0 = behind all siblings.",
+  "insert_child"
 );
 
 registerTool(
@@ -247,23 +271,33 @@ registerTool(
 registerTool(
   "create_instance",
   {
-    componentId: z.string().describe("ID of a COMPONENT or COMPONENT_SET node"),
+    componentId: z.string().optional().describe("ID of a COMPONENT or COMPONENT_SET node"),
+    componentKey: z.string().optional().describe("Key of a published COMPONENT or COMPONENT_SET (for library components). Use this instead of componentId for external/shared libraries."),
     variantProperties: z.record(z.string()).optional().describe("Key-value pairs to select a specific variant, e.g. {\"Style\": \"Filled\", \"State\": \"Enabled\"}"),
     x: z.number().optional(),
-    y: z.number().optional()
+    y: z.number().optional(),
+    parentId: z.string().optional().describe("Optional parent frame/group ID. If omitted, appends to page.")
   },
-  "Create an instance of a component or component set variant. Pass variantProperties to pick a specific variant from a COMPONENT_SET.",
+  "Create an instance of a component or component set variant. Pass variantProperties to pick a specific variant from a COMPONENT_SET. Use componentKey instead of componentId for components from external/shared libraries.",
   "create_instance"
 );
 
 registerTool(
   "list_variants",
   {
-    componentSetId: z.string().describe("ID of a COMPONENT_SET node"),
+    componentSetId: z.string().optional().describe("ID of a COMPONENT_SET node"),
+    componentSetKey: z.string().optional().describe("Key of a published COMPONENT_SET (for library components). Use this instead of componentSetId for external/shared libraries."),
     limit: z.number().optional().describe("Max variants to return (default 50)")
   },
-  "List variant axes (properties and their possible values) and individual variants for a COMPONENT_SET.",
+  "List variant axes (properties and their possible values) and individual variants for a COMPONENT_SET. Use componentSetKey instead of componentSetId for components from external/shared libraries.",
   "list_variants"
+);
+
+registerTool(
+  "get_file_key",
+  {},
+  "Get the file key of the currently open Figma file. Useful for constructing Figma URLs or cross-referencing with the Figma REST API.",
+  "get_file_key"
 );
 
 registerTool(
@@ -277,10 +311,28 @@ registerTool(
   "swap_component",
   {
     nodeId: z.string().describe("ID of an INSTANCE node to swap"),
-    componentId: z.string().describe("ID of the COMPONENT or COMPONENT_SET to swap to")
+    componentId: z.string().optional().describe("ID of the COMPONENT or COMPONENT_SET to swap to"),
+    componentKey: z.string().optional().describe("Key of a published COMPONENT or COMPONENT_SET to swap to (for library components). Use this instead of componentId for external/shared libraries.")
   },
-  "Swap the component that an instance points to. The instance keeps its position and overrides but changes its source component.",
+  "Swap the component that an instance points to. The instance keeps its position and overrides but changes its source component. Use componentKey instead of componentId for components from external/shared libraries.",
   "swap_component"
+);
+
+registerTool(
+  "get_instance_properties",
+  { nodeId: z.string().describe("ID of an INSTANCE node") },
+  "Get the exposed component properties of an instance (TEXT, BOOLEAN, INSTANCE_SWAP, VARIANT). Returns property names with their types and current values. Use the full property name (including #ID suffix) with set_instance_properties.",
+  "get_instance_properties"
+);
+
+registerTool(
+  "set_instance_properties",
+  {
+    nodeId: z.string().describe("ID of an INSTANCE node"),
+    properties: z.record(z.union([z.string(), z.boolean()])).describe("Property overrides keyed by full property name (including #ID suffix). TEXT properties take strings, BOOLEAN properties take booleans, INSTANCE_SWAP properties take component IDs as strings.")
+  },
+  "Override exposed component properties on an instance. Use get_instance_properties first to discover property names and their #ID suffixes. Example: { \"Label text#12:45\": \"Sign In\", \"Show icon#3:7\": true }",
+  "set_instance_properties"
 );
 
 registerTool(

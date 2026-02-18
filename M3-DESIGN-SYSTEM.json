@@ -1,0 +1,581 @@
+{
+  "meta": {
+    "source": "Material 3 Design Kit",
+    "extractedFrom": "Figma M3 Design Kit",
+    "date": "2026-02-04"
+  },
+  "fonts": {
+    "primary": "Roboto",
+    "fallback": "Inter",
+    "availableStyles": ["Regular"],
+    "unavailableStyles": ["Medium", "SemiBold", "Bold"],
+    "note": "Use Inter Regular for all text — other weights cause font loading errors in Figma plugin"
+  },
+  "colors": {
+    "light": {
+      "primary": "#6750a4",
+      "onPrimary": "#ffffff",
+      "primaryContainer": "#eaddff",
+      "onPrimaryContainer": "#4f378a",
+      "primaryFixed": "#eaddff",
+      "onPrimaryFixed": "#21005d",
+      "primaryFixedDim": "#d0bcff",
+      "onPrimaryFixedVariant": "#4f378b",
+      "secondary": "#625b71",
+      "onSecondary": "#ffffff",
+      "secondaryContainer": "#e8def8",
+      "onSecondaryContainer": "#4a4459",
+      "secondaryFixed": "#e8def8",
+      "onSecondaryFixed": "#1d192b",
+      "secondaryFixedDim": "#ccc2dc",
+      "onSecondaryFixedVariant": "#4a4458",
+      "tertiary": "#7d5260",
+      "onTertiary": "#ffffff",
+      "tertiaryContainer": "#ffd8e4",
+      "onTertiaryContainer": "#633b48",
+      "tertiaryFixed": "#ffd8e4",
+      "onTertiaryFixed": "#31111d",
+      "tertiaryFixedDim": "#efb8c8",
+      "onTertiaryFixedVariant": "#633b48",
+      "error": "#b3261e",
+      "onError": "#ffffff",
+      "errorContainer": "#f9dedc",
+      "onErrorContainer": "#852221",
+      "outline": "#79747e",
+      "outlineVariant": "#cac4d0",
+      "background": "#fef7ff",
+      "onBackground": "#1d1b20",
+      "surface": "#fef7ff",
+      "onSurface": "#1d1b20",
+      "surfaceVariant": "#e7e0ec",
+      "onSurfaceVariant": "#49454f",
+      "inverseSurface": "#322f35",
+      "inverseOnSurface": "#f5eff7",
+      "inversePrimary": "#d0bcff",
+      "shadow": "#000000",
+      "surfaceTint": "#6750a4",
+      "scrim": "#000000",
+      "surfaceContainerHighest": "#e6e0e9",
+      "surfaceContainerHigh": "#ece6f0",
+      "surfaceContainer": "#f3edf7",
+      "surfaceContainerLow": "#f7f2fa",
+      "surfaceContainerLowest": "#ffffff",
+      "surfaceBright": "#fef7ff",
+      "surfaceDim": "#ded8e1"
+    },
+    "dark": {
+      "primary": "#d0bcfe",
+      "onPrimary": "#381e72",
+      "primaryContainer": "#4f378b",
+      "onPrimaryContainer": "#eaddff",
+      "primaryFixed": "#eaddff",
+      "onPrimaryFixed": "#21005d",
+      "primaryFixedDim": "#d0bcff",
+      "onPrimaryFixedVariant": "#4f378b",
+      "secondary": "#ccc2dc",
+      "onSecondary": "#332d41",
+      "secondaryContainer": "#4a4458",
+      "onSecondaryContainer": "#e8def8",
+      "secondaryFixed": "#e8def8",
+      "onSecondaryFixed": "#1d192b",
+      "secondaryFixedDim": "#ccc2dc",
+      "onSecondaryFixedVariant": "#4a4458",
+      "tertiary": "#efb8c8",
+      "onTertiary": "#492532",
+      "tertiaryContainer": "#633b48",
+      "onTertiaryContainer": "#ffd8e4",
+      "tertiaryFixed": "#ffd8e4",
+      "onTertiaryFixed": "#31111d",
+      "tertiaryFixedDim": "#efb8c8",
+      "onTertiaryFixedVariant": "#633b48",
+      "error": "#f2b8b5",
+      "onError": "#601410",
+      "errorContainer": "#8c1d18",
+      "onErrorContainer": "#f9dedc",
+      "outline": "#938f99",
+      "outlineVariant": "#49454f",
+      "background": "#141218",
+      "onBackground": "#e6e0e9",
+      "surface": "#141218",
+      "onSurface": "#e6e0e9",
+      "surfaceVariant": "#49454f",
+      "onSurfaceVariant": "#cac4d0",
+      "inverseSurface": "#e6e0e9",
+      "inverseOnSurface": "#322f35",
+      "inversePrimary": "#6750a4",
+      "shadow": "#000000",
+      "surfaceTint": "#d0bcff",
+      "scrim": "#000000",
+      "surfaceContainerHighest": "#36343b",
+      "surfaceContainerHigh": "#2b2930",
+      "surfaceContainer": "#211f26",
+      "surfaceContainerLow": "#1d1b20",
+      "surfaceContainerLowest": "#0f0d13",
+      "surfaceBright": "#3b383e",
+      "surfaceDim": "#141218"
+    }
+  },
+  "typography": {
+    "displayLarge": { "fontSize": 57, "lineHeight": 64, "fontWeight": 400, "letterSpacing": -0.25 },
+    "displayMedium": { "fontSize": 45, "lineHeight": 52, "fontWeight": 400, "letterSpacing": 0 },
+    "displaySmall": { "fontSize": 36, "lineHeight": 44, "fontWeight": 400, "letterSpacing": 0 },
+    "headlineLarge": { "fontSize": 32, "lineHeight": 40, "fontWeight": 400, "letterSpacing": 0 },
+    "headlineMedium": { "fontSize": 28, "lineHeight": 36, "fontWeight": 400, "letterSpacing": 0 },
+    "headlineSmall": { "fontSize": 24, "lineHeight": 32, "fontWeight": 400, "letterSpacing": 0 },
+    "titleLarge": { "fontSize": 22, "lineHeight": 28, "fontWeight": 400, "letterSpacing": 0 },
+    "titleMedium": { "fontSize": 16, "lineHeight": 24, "fontWeight": 500, "letterSpacing": 0.15 },
+    "titleSmall": { "fontSize": 14, "lineHeight": 20, "fontWeight": 500, "letterSpacing": 0.1 },
+    "labelLarge": { "fontSize": 14, "lineHeight": 20, "fontWeight": 500, "letterSpacing": 0.1 },
+    "labelMedium": { "fontSize": 12, "lineHeight": 16, "fontWeight": 500, "letterSpacing": 0.5 },
+    "labelSmall": { "fontSize": 11, "lineHeight": 16, "fontWeight": 500, "letterSpacing": 0.5 },
+    "bodyLarge": { "fontSize": 16, "lineHeight": 24, "fontWeight": 400, "letterSpacing": 0.5 },
+    "bodyMedium": { "fontSize": 14, "lineHeight": 20, "fontWeight": 400, "letterSpacing": 0.25 },
+    "bodySmall": { "fontSize": 12, "lineHeight": 16, "fontWeight": 400, "letterSpacing": 0.4 }
+  },
+  "shape": {
+    "none": 0,
+    "extraSmall": 4,
+    "small": 8,
+    "medium": 12,
+    "large": 16,
+    "largeIncreased": 20,
+    "extraLarge": 28,
+    "extraLargeIncreased": 32,
+    "extraExtraLarge": 48,
+    "full": 1000
+  },
+  "elevation": {
+    "light": {
+      "level0": { "shadow": "none" },
+      "level1": { "effects": [{ "type": "DROP_SHADOW", "radius": 3, "spread": 1 }, { "type": "DROP_SHADOW", "radius": 2, "spread": 0 }] },
+      "level2": { "effects": [{ "type": "DROP_SHADOW", "radius": 6, "spread": 2 }, { "type": "DROP_SHADOW", "radius": 2, "spread": 0 }] },
+      "level3": { "effects": [{ "type": "DROP_SHADOW", "radius": 3, "spread": 0 }, { "type": "DROP_SHADOW", "radius": 8, "spread": 3 }] },
+      "level4": { "effects": [{ "type": "DROP_SHADOW", "radius": 3, "spread": 0 }, { "type": "DROP_SHADOW", "radius": 10, "spread": 4 }] },
+      "level5": { "effects": [{ "type": "DROP_SHADOW", "radius": 4, "spread": 0 }, { "type": "DROP_SHADOW", "radius": 12, "spread": 6 }] }
+    },
+    "dark": {
+      "level0": { "shadow": "none" },
+      "level1": { "effects": [{ "type": "DROP_SHADOW", "radius": 2, "spread": 0 }, { "type": "DROP_SHADOW", "radius": 3, "spread": 1 }] },
+      "level2": { "effects": [{ "type": "DROP_SHADOW", "radius": 2, "spread": 0 }, { "type": "DROP_SHADOW", "radius": 6, "spread": 2 }] },
+      "level3": { "effects": [{ "type": "DROP_SHADOW", "radius": 3, "spread": 0 }, { "type": "DROP_SHADOW", "radius": 8, "spread": 3 }] },
+      "level4": { "effects": [{ "type": "DROP_SHADOW", "radius": 3, "spread": 0 }, { "type": "DROP_SHADOW", "radius": 10, "spread": 4 }] },
+      "level5": { "effects": [{ "type": "DROP_SHADOW", "radius": 4, "spread": 0 }, { "type": "DROP_SHADOW", "radius": 12, "spread": 6 }] }
+    }
+  },
+  "components": {
+    "appBars": {
+      "componentSets": [
+        {
+          "name": "App bar",
+          "id": "58114:20565",
+          "key": "0ea0c8495fa22317d9d3e06f73881c43a89bdc70",
+          "axes": {
+            "Configuration": ["Small-centered", "Small-image", "Search", "Small", "Medium", "Large"],
+            "Elevation": ["Flat", "On-scroll"]
+          },
+          "notes": "Use 'Small-centered' for simple screens, 'Large' for detail views with prominent titles"
+        },
+        {
+          "name": "Bottom app bar",
+          "id": "51159:5105",
+          "key": "d27ead4058eca4a29213d701180d63e183d60b9c",
+          "axes": {
+            "Icons": ["1", "2", "3", "4"]
+          }
+        }
+      ]
+    },
+    "buttons": {
+      "componentSets": [
+        {
+          "name": "Button",
+          "id": "57994:2227",
+          "key": "b90ab059a2dfc3d8ddc3eb0f5a8678822ca2bc38",
+          "axes": {
+            "Type": ["Round", "Square"],
+            "Size": ["XSmall", "Small", "Medium", "Large", "XLarge"],
+            "State": ["Enabled", "Hovered", "Focused", "Pressed", "Disabled"]
+          },
+          "notes": "This is the new unified Button component. Use Type=Round for pill-shaped buttons."
+        },
+        {
+          "name": "Button - text",
+          "id": "58650:8094",
+          "key": null
+        },
+        {
+          "name": "Button - elevated",
+          "id": "58650:9294",
+          "key": null
+        },
+        {
+          "name": "Button - outline",
+          "id": "58650:10213",
+          "key": null
+        },
+        {
+          "name": "Button - tonal",
+          "id": "58651:11237",
+          "key": null
+        },
+        {
+          "name": "Icon button",
+          "id": "57994:10081",
+          "key": "36329f6c950e4d16f020b31df9b5b9ab89f6a73d",
+          "axes": {
+            "Type": ["Round", "Square"],
+            "Size": ["XSmall", "Small", "Medium", "Large", "XLarge"],
+            "Width": ["Narrow", "Default", "Wide"],
+            "State": ["Enabled", "Hovered", "Focused", "Pressed", "Disabled"]
+          }
+        },
+        {
+          "name": "Segmented button",
+          "id": "53923:36615",
+          "key": null
+        }
+      ]
+    },
+    "cards": {
+      "componentSets": [
+        {
+          "name": "Stacked card",
+          "id": "52346:27573",
+          "key": "03eec60f28ea081d8b4ffef36ee84b818a50f4ce",
+          "axes": {
+            "Style": ["Outlined", "Elevated", "Filled"],
+            "Layout": ["Slot", "Media & text"]
+          },
+          "notes": "Cards use auto-layout hug-content. Don't manually constrain height."
+        },
+        {
+          "name": "Horizontal card",
+          "id": "52350:27876",
+          "key": "c8f2912c5b3df8faeed76b527e39711d74556ed3",
+          "axes": {
+            "Style": ["Outlined", "Elevated", "Filled"],
+            "Layout": ["Slot", "Media & text"]
+          }
+        }
+      ]
+    },
+    "navigation": {
+      "componentSets": [
+        {
+          "name": "Navigation Bar: Vertical items",
+          "id": "58016:37259",
+          "key": "21555234db5b6bf7ae95690c56d17dbca4821a8f",
+          "axes": {
+            "Nav items": ["3", "4", "5"]
+          },
+          "notes": "Use for phone layouts (412px). Vertical label arrangement."
+        },
+        {
+          "name": "Navigation Bar: Horizontal items",
+          "id": "58016:37236",
+          "key": "ad1c4f08928dd1a7950b39053c73c4ba45f7b5cc",
+          "axes": {
+            "Nav items": ["3", "4", "5", "6"]
+          },
+          "notes": "Use for tablet layouts (840px+). Horizontal label arrangement."
+        },
+        {
+          "name": "Navigation Rail",
+          "id": "58016:36879",
+          "key": "295201eeef75c5963d280cbe48d13ed001759605",
+          "axes": {
+            "Alignment": ["Top", "Middle"],
+            "Nav items": ["3", "4", "5", "6"]
+          },
+          "notes": "Use for desktop/tablet side navigation"
+        },
+        {
+          "name": "Navigation Rail: Expanded",
+          "id": "58016:36670",
+          "key": null,
+          "notes": "Expanded drawer-style navigation rail"
+        }
+      ]
+    },
+    "textFields": {
+      "componentSets": [
+        {
+          "name": "Text field",
+          "id": "52798:24373",
+          "key": "d109e4ed22a07419a23adf5e7264af2cb34a261c",
+          "axes": {
+            "Style": ["Filled", "Outlined"],
+            "State": ["Enabled", "Hovered", "Focused", "Error", "Disabled"],
+            "Text configurations": ["Input text", "Label text", "Placeholder text"],
+            "Leading icon": ["False", "True"],
+            "Trailing icon": ["True", "False"]
+          }
+        }
+      ]
+    },
+    "lists": {
+      "componentSets": [
+        {
+          "name": "List",
+          "id": "59106:13028",
+          "key": "f22fb00878cb79cd41be99f856a86ff12dacd369",
+          "axes": {
+            "Type": ["Standard", "Segmented (filled)", "Expandable", "Draggable", "Swipable - standard", "Swipable - segmented"],
+            "Multi-line": ["False", "True"]
+          }
+        },
+        {
+          "name": "List item",
+          "id": "59106:13183",
+          "key": "871e4cce6e46531cc40881ba607eb296fde0d704",
+          "axes": {
+            "Alignment": ["Middle-aligned", "Top-aligned"],
+            "State": ["Enabled", "Hovered", "Focused", "Pressed", "Dragged", "Disabled"],
+            "Selected": ["False", "True"]
+          }
+        }
+      ]
+    },
+    "chips": {
+      "componentSets": [
+        {
+          "name": "Assistive chip",
+          "id": "53923:28089",
+          "key": "06e822ac6c3e1a4822166fc1db72139906a81f56",
+          "axes": {
+            "Style": ["Outlined", "Elevated"],
+            "Configuration": ["Label only", "Label & icon", "Label & favicon", "Label & brand icon"],
+            "State": ["Enabled", "Hovered", "Focused", "Pressed", "Dragged", "Disabled"]
+          }
+        },
+        {
+          "name": "Filter chip",
+          "id": "53923:28270",
+          "key": "13d45d3654cd19a1deeff343b11ab8fd66ee0219",
+          "axes": {
+            "Style": ["Outlined", "Elevated"],
+            "Configuration": ["Label only", "Label & leading icon"],
+            "State": ["Enabled", "Hovered", "Focused", "Pressed", "Dragged", "Disabled"],
+            "Selected": ["False", "True"],
+            "Show trailing icon": ["False", "True"]
+          }
+        },
+        {
+          "name": "Suggestion chip",
+          "id": "53923:28679",
+          "key": null
+        },
+        {
+          "name": "Input chip",
+          "id": "53923:27888",
+          "key": null
+        }
+      ]
+    },
+    "checkboxes": {
+      "componentSets": [
+        {
+          "name": "Checkboxes",
+          "id": "51859:5628",
+          "key": "7e478d6c0efe4fadca8bba0cce29a6edb30e04af",
+          "axes": {
+            "Type": ["Selected", "Unselected", "Indeterminate", "Error unselected", "Error indeterminate", "Error selected"],
+            "State": ["Enabled", "Hovered", "Focused", "Pressed", "Disabled"]
+          }
+        }
+      ]
+    },
+    "radioButtons": {
+      "componentSets": [
+        {
+          "name": "Radio buttons",
+          "id": "51739:4608",
+          "key": "5a497e447f2606b4dfc047f65462fe2cb07aa83f",
+          "axes": {
+            "Selected": ["True", "False"],
+            "State": ["Enabled", "Hovered", "Focused", "Pressed", "Disabled"]
+          }
+        }
+      ]
+    },
+    "switches": {
+      "componentSets": [
+        {
+          "name": "Switch",
+          "id": "54446:25289",
+          "key": "0b0dfe2cd2e7420a4553516dcbdce473149f918f",
+          "axes": {
+            "Selected": ["False", "True"],
+            "State": ["Enabled", "Hovered", "Focused", "Pressed", "Disabled"],
+            "Icon": ["False", "True"]
+          }
+        }
+      ]
+    },
+    "tabs": {
+      "componentSets": [
+        {
+          "name": "Tabs",
+          "id": "54563:40023",
+          "key": "784b929bf6114d97affc3251289dd8d16c36a9c0",
+          "axes": {
+            "Type": ["Fixed", "Scrollable"],
+            "Style": ["Primary", "Secondary"],
+            "Configuration": ["Icon only", "Label & icon", "Label only"]
+          }
+        }
+      ]
+    },
+    "dialogs": {
+      "componentSets": [
+        {
+          "name": "Basic dialog",
+          "id": "50723:10929",
+          "key": "32149789ef38a3066bac073a233610b8d5f2196a",
+          "axes": {
+            "Icon": ["True", "False"]
+          }
+        },
+        {
+          "name": "List dialog",
+          "id": "52112:28937",
+          "key": null
+        },
+        {
+          "name": "Scrollable list dialog",
+          "id": "52112:29186",
+          "key": null
+        }
+      ]
+    },
+    "snackbar": {
+      "componentSets": [
+        {
+          "name": "Snackbar",
+          "id": "53977:33575",
+          "key": "ba9f6d46a1be637aeb955a04066e7a78a55fc46c",
+          "axes": {
+            "Configuration": ["Text only", "Text & action", "Text & longer action"],
+            "# of lines": ["One line", "Two lines"],
+            "Show close affordance": ["False", "True"]
+          }
+        }
+      ]
+    },
+    "badges": {
+      "componentSets": [
+        {
+          "name": "Badges",
+          "id": "51592:4768",
+          "key": "d98de682ca80d8b73b601e8f1581ccf7bca36d61",
+          "axes": {
+            "Size": ["Large", "Small"]
+          }
+        }
+      ]
+    },
+    "search": {
+      "componentSets": [
+        {
+          "name": "Search bar",
+          "id": "52977:33813",
+          "key": "2ac8b83f60fa0468170736a7367d347ba4595faf",
+          "axes": {
+            "State": ["Enabled", "Hovered", "Pressed"],
+            "Show avatar": ["False", "True"]
+          }
+        },
+        {
+          "name": "Search view modal",
+          "id": "52977:33958",
+          "key": null
+        },
+        {
+          "name": "Search view full-screen",
+          "id": "52977:34015",
+          "key": null
+        }
+      ]
+    },
+    "sheets": {
+      "componentSets": [
+        {
+          "name": "Bottom sheet",
+          "id": "51827:5859",
+          "key": "cd5c35d0f6bc1c278e187e9c643cf85ca163816b",
+          "axes": {
+            "Modal": ["False", "True"]
+          }
+        },
+        {
+          "name": "Side Sheet",
+          "id": "53198:27851",
+          "key": null
+        }
+      ]
+    },
+    "progressIndicators": {
+      "componentSets": [
+        {
+          "name": "Linear-determinate progress indicator",
+          "id": "58005:7997",
+          "key": null
+        },
+        {
+          "name": "Linear-indeterminate progress indicator",
+          "id": "58005:8284",
+          "key": null
+        },
+        {
+          "name": "Circular-determinate progress indicator",
+          "id": "58005:8459",
+          "key": null
+        },
+        {
+          "name": "Circular-indeterminate progress indicator",
+          "id": "58005:8525",
+          "key": null
+        }
+      ]
+    },
+    "menus": {
+      "componentSets": [
+        {
+          "name": "Menu",
+          "id": "58966:3975",
+          "key": null
+        }
+      ]
+    },
+    "sliders": {
+      "componentSets": [
+        {
+          "name": "Standard slider",
+          "id": "58008:10356",
+          "key": null
+        },
+        {
+          "name": "Centered slider",
+          "id": "58008:10979",
+          "key": null
+        },
+        {
+          "name": "Range slider",
+          "id": "58008:11810",
+          "key": null
+        }
+      ]
+    },
+    "dividers": {
+      "components": [
+        { "name": "Horizontal/Full-width", "id": "51816:5860", "type": "COMPONENT", "notes": "Not a set — use ID directly without variantProperties" },
+        { "name": "Horizontal/Inset", "id": "51816:5868", "type": "COMPONENT" },
+        { "name": "Horizontal/Middle-inset", "id": "51816:5870", "type": "COMPONENT" },
+        { "name": "Horizontal/Divider with subhead", "id": "51816:5872", "type": "COMPONENT" },
+        { "name": "Vertical/Full-width", "id": "51816:5862", "type": "COMPONENT" },
+        { "name": "Vertical/Inset", "id": "51816:5864", "type": "COMPONENT" },
+        { "name": "Vertical/Middle-inset", "id": "51816:5866", "type": "COMPONENT" }
+      ]
+    }
+  }
+}

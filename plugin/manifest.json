@@ -6,6 +6,7 @@
   "ui": "ui.html",
   "editorType": ["figma", "dev"],
   "capabilities": ["inspect"],
+  "enablePrivatePluginApi": true,
   "networkAccess": {
     "allowedDomains": ["*"],
     "reasoning": "This plugin needs network access to communicate with the MCP server running on your local machine."

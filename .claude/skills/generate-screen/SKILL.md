@@ -1,14 +1,16 @@
-# Figma Compose MCP — Agent Instructions
+---
+name: generate-screen
+description: Generate a complete UI screen in Figma using Material 3 component instances
+argument-hint: "[screen description]"
+allowed-tools: Bash, Read, Grep, Glob, mcp__figma__get_screenshot, mcp__figma__get_design_context, mcp__figma__get_metadata
+---
 
-## Overview
+# Figma Screen Generation
 
-This system allows an AI agent to generate complete UI screens in Figma using real Material 3 component instances via two MCP servers: one for reading Figma data and one for writing to the canvas through a plugin bridge.
-```
+Generate a complete UI screen in Figma using real Material 3 component instances via the Figma Compose MCP bridge.
 
-## Prerequisites
+**User request:** $ARGUMENTS
 
-1. The Figma Desktop plugin must be running with the WebSocket connection active
-2. Both MCP servers must be registered in the Claude Code config
 ## Core Workflow
 
 ### Step 1: Create and configure the frame
@@ -134,14 +136,23 @@ Components like Cards use auto-layout with hug-content sizing. Setting an arbitr
 - Let the component auto-size based on its content
 - Measure the content height with `get_node_info` first, then set height to content + padding
 
-### Rule 5: Use the correct component variant for the screen size
+### Rule 5: ALWAYS use "Vertical items" navigation bar
 
-- **Phone (412px):** Use "Vertical items" variants for navigation bars
-- **Tablet (840px+):** Use "Horizontal items" variants for navigation bars
+Always use the **Nav Bar Vertical** component set (`58016:37259`) — never the Horizontal items variant. The Horizontal variant is for tablets and will squish labels on phone frames.
 
-Check component descriptions in `M3-DESIGN-SYSTEM.json` for size guidance.
+```
+create_instance({ componentSetId: "58016:37259", variantProperties: { "Nav items": "4" }, ... })
+```
 
-### Rule 6: Pin bottom navigation to the frame bottom
+### Rule 6: Default to "Small-centered" app bar
+
+Always use the **Small-centered, Flat** app bar variant unless the user explicitly requests a different style. This ensures consistent header placement across screens.
+
+```
+create_instance({ componentSetId: "58114:20565", variantProperties: { "Configuration": "Small-centered", "Elevation": "Flat" }, ... })
+```
+
+### Rule 7: Pin bottom navigation to the frame bottom
 
 ```
 nav_y = frame_h - nav_height
@@ -149,15 +160,26 @@ nav_y = frame_h - nav_height
 
 When using `parentId`, the y-coordinate is relative to the frame so no `frame_y` offset is needed.
 
-### Rule 7: Use Inter Regular for all text
+### Rule 8: Use Inter Regular for all text
 
 Inter Medium and other weights may not be loaded in the Figma environment. Stick with `fontFamily: "Inter"`, `fontStyle: "Regular"` to avoid font loading errors.
 
-### Rule 8: Screenshot and verify after completing a screen
+### Rule 9: Screenshot and verify after completing a screen
+
+First, get the file key from the compose bridge, then use it with `get_screenshot`:
 
 ```
-get_screenshot({ nodeId: "<frameId>" })
+get_file_key()          // returns { fileKey: "..." }
+get_screenshot({ fileKey: "<fileKey>", nodeId: "<frameId>" })
 ```
+
+`get_screenshot` returns the image inline for direct visual verification — no decoding or file workarounds needed.
+
+**Fallback:** If `get_screenshot` is unavailable, use `export_node` with `scale: 0.5` to stay under tool result size limits:
+```
+export_node({ nodeId: "<frameId>", format: "PNG", scale: 0.5 })
+```
+Note: `export_node` at scale 1 or 2 often exceeds the tool result character limit (~30k chars) and requires saving to a file and decoding — avoid this unless higher resolution is specifically needed.
 
 Check for:
 - Elements bleeding outside the frame
@@ -166,29 +188,60 @@ Check for:
 - Inconsistent alignment or spacing
 - Buttons clipped by parent component borders
 
+### Rule 10: ALWAYS check for and fix overlapping elements
+
+After taking the screenshot, visually inspect for any overlapping components. If overlaps are found, fix them with the **smallest possible change** — typically a `set_position` to nudge the overlapping element down or sideways.
+
+**Diagnosis:** Two elements overlap when `element_A.y + element_A.height > element_B.y` (vertical) or analogously for horizontal overlap.
+
+**Fix strategy — do the minimum:**
+1. Identify the overlapping pair closest to correct placement
+2. Use `get_node_info` on both to get exact positions and dimensions
+3. Shift only the lower/later element by the exact overlap amount plus the appropriate gap (8/16/24px)
+4. Re-check downstream elements — if moving one element causes a cascade, shift subsequent elements by the same delta
+5. Do NOT rebuild or reposition all elements. Do NOT recreate instances. Only adjust the positions that are actually wrong.
+
+```
+// Example: item_B overlaps item_A
+get_node_info({ nodeId: "<item_A>" })  // y: 200, height: 88
+get_node_info({ nodeId: "<item_B>" })  // y: 270 — but should be >= 288 (200+88)
+overlap = (200 + 88) - 270            // 18px overlap
+set_position({ nodeId: "<item_B>", x: current_x, y: 270 + 18 + 8 })  // shift by overlap + 8px gap
+```
+
+After fixing, take another screenshot to confirm no remaining overlaps.
+
 ## Changing the Active Navigation Tab
 
-The M3 navigation bar always makes item 1 active by default. To change which tab appears active:
+The M3 navigation bar activates item 1 by default. Each nav item exposes a `Selected` variant property that can be toggled via `set_instance_properties`.
 
-1. **Discover icon component IDs** — Use `get_node_info` on each nav item's icon instance to find its `mainComponentId` (e.g., `stars_filled` = `54616:25409`, `stars` = `54616:25411`)
+### Step 1: Find the nav item instances
 
-2. **Toggle visibility** — Hide the current active item's filled icon and show its outlined icon:
-   ```
-   set_properties({ nodeId: "<item1_filledIcon>", props: { visible: false, opacity: 0 } })
-   set_properties({ nodeId: "<item1_outlinedIcon>", props: { visible: true, opacity: 1 } })
-   ```
+```
+find_nodes({ type: "INSTANCE", nameContains: "Nav item", within: "<navBarId>" })
+```
 
-3. **Swap icon components** — Change the source component reference:
-   ```
-   swap_component({ nodeId: "<item1_icon>", componentId: "<outlinedIconId>" })
-   swap_component({ nodeId: "<targetItem_icon>", componentId: "<filledIconId>" })
-   ```
+### Step 2: Get instance properties to discover property key IDs
 
-4. **Swap pill backgrounds** — Remove the pill from the old active item and add it to the new one:
-   ```
-   set_properties({ nodeId: "<item1_iconContainer>", props: { fills: [] } })
-   set_fill({ nodeId: "<targetItem_iconContainer>", hex: "#e8def8" })
-   ```
+```
+get_instance_properties({ nodeId: "<navItem01Id>" })
+// Returns properties including: "Selected" (VARIANT), "Label text#...:..." (TEXT)
+```
+
+**IMPORTANT:** Property key IDs (the `#...:...` suffix) differ between nav bars. Always call `get_instance_properties` on the actual nav item instance — never reuse property IDs from a different nav bar.
+
+### Step 3: Set Selected and labels
+
+```
+// Deactivate item 1 (default active)
+set_instance_properties({ nodeId: "<navItem01Id>", properties: { "Selected": "False" } })
+
+// Activate the target item
+set_instance_properties({ nodeId: "<targetItemId>", properties: { "Selected": "True" } })
+
+// Set labels on all items (use the correct Label text#...:... key from step 2)
+set_instance_properties({ nodeId: "<navItem01Id>", properties: { "Label text#...:...": "Home" } })
+```
 
 ## Available Tools
 
@@ -217,7 +270,8 @@ The M3 navigation bar always makes item 1 active by default. To change which tab
 | `set_reactions` | Set prototype interactions (navigation, overlays, transitions) |
 | `get_local_styles` | Get paint/text/effect styles from the file |
 | `get_local_variables` | Get design token variables |
-| `export_node` | Export a node as PNG/SVG/JPG/PDF |
+| `get_file_key` | Get the file key of the currently open Figma file (needed for `get_screenshot`) |
+| `export_node` | Export a node as PNG/SVG/JPG/PDF (use `scale: 0.5` to avoid size limits) |
 | `clear_page` | Delete all nodes on current page |
 
 ## Local vs Library Components
@@ -233,10 +287,10 @@ The M3 navigation bar always makes item 1 active by default. To change which tab
 |---|---|---|
 | Text not centered | Guessing x-position | Measure width with `get_node_info`, compute `center_x - width/2` |
 | Dividers don't span the screen | Default width is narrower than frame | `resize_node` to frame width after creation |
-| Nav bar labels squished | Using tablet variant on phone frame | Use "Vertical items" variant for 412px |
+| Nav bar labels squished | Using Horizontal items variant | Always use "Vertical items" (`58016:37259`) — never Horizontal |
 | List items overlapping | Spacing based on assumed height | Measure actual height, then add gap |
 | Components clipped at edges | Placed without checking actual width | Measure width, adjust position |
 | Buttons outside card bounds | Card height set arbitrarily | Let auto-layout size the card, or measure content first |
-| Nav bar wrong tab active | M3 nav always activates item 1 | Use `get_node_info` + `swap_component` + `set_properties` workflow |
+| Nav bar wrong tab active | M3 nav always activates item 1 | Use `get_instance_properties` then `set_instance_properties` with `"Selected": "True"/"False"` |
 | Font loading error | Using Inter Medium or other weights | Use `fontStyle: "Regular"` only |
 | Elements appear unchanged | Modified vector inside instance instead of instance itself | Use `set_properties` on the INSTANCE node |
