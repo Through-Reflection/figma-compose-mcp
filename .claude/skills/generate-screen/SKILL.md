@@ -1,13 +1,13 @@
 ---
 name: generate-screen
-description: Generate a complete UI screen in Figma using Material 3 component instances
+description: Generate a complete UI screen in Figma using design system component instances
 argument-hint: "[screen description]"
 allowed-tools: Bash, Read, Grep, Glob, mcp__figma__get_screenshot, mcp__figma__get_design_context, mcp__figma__get_metadata
 ---
 
 # Figma Screen Generation
 
-Generate a complete UI screen in Figma using real Material 3 component instances via the Figma Compose MCP bridge.
+Generate a complete UI screen in Figma using real design system component instances via the Figma Compose MCP bridge.
 
 **User request:** $ARGUMENTS
 
@@ -25,7 +25,7 @@ Record the frame ID and dimensions (`frame_w`, `frame_h`). Setting `clipsContent
 
 ### Step 2: Look up component IDs
 
-Find the component in `M3-DESIGN-SYSTEM.json`. Each component set has an `id` field (e.g., `"57994:2227"` for Button) and optionally a `key` field for published/library components. If `key` is present and the component is from an external library, use `componentKey` instead of `componentId`.
+Find the component in the design system JSON (extracted via `/extract-design-system`). Each component set has an `id` field and optionally a `key` field for published/library components. If `key` is present and the component is from an external library, use `componentKey` instead of `componentId`.
 
 ### Step 3: Check available variants before creating instances
 
@@ -136,21 +136,13 @@ Components like Cards use auto-layout with hug-content sizing. Setting an arbitr
 - Let the component auto-size based on its content
 - Measure the content height with `get_node_info` first, then set height to content + padding
 
-### Rule 5: ALWAYS use "Vertical items" navigation bar
+### Rule 5: Check component notes for screen-size-specific variants
 
-Always use the **Nav Bar Vertical** component set (`58016:37259`) — never the Horizontal items variant. The Horizontal variant is for tablets and will squish labels on phone frames.
+Some design systems have separate component variants for different screen sizes (e.g., phone vs tablet navigation bars). Always check the `notes` field in the design system JSON for guidance on which variant to use for your target frame size.
 
-```
-create_instance({ componentSetId: "58016:37259", variantProperties: { "Nav items": "4" }, ... })
-```
+### Rule 6: Use sensible default variants for common components
 
-### Rule 6: Default to "Small-centered" app bar
-
-Always use the **Small-centered, Flat** app bar variant unless the user explicitly requests a different style. This ensures consistent header placement across screens.
-
-```
-create_instance({ componentSetId: "58114:20565", variantProperties: { "Configuration": "Small-centered", "Elevation": "Flat" }, ... })
-```
+When placing app bars, navigation bars, or other structural components, prefer the simplest/most common variant unless the user requests otherwise. Check `list_variants` to see available options and pick the default or most standard configuration.
 
 ### Rule 7: Pin bottom navigation to the frame bottom
 
@@ -213,7 +205,7 @@ After fixing, take another screenshot to confirm no remaining overlaps.
 
 ## Changing the Active Navigation Tab
 
-The M3 navigation bar activates item 1 by default. Each nav item exposes a `Selected` variant property that can be toggled via `set_instance_properties`.
+Many navigation bar components activate item 1 by default. Each nav item may expose a `Selected` variant property that can be toggled via `set_instance_properties`.
 
 ### Step 1: Find the nav item instances
 
@@ -287,10 +279,10 @@ set_instance_properties({ nodeId: "<navItem01Id>", properties: { "Label text#...
 |---|---|---|
 | Text not centered | Guessing x-position | Measure width with `get_node_info`, compute `center_x - width/2` |
 | Dividers don't span the screen | Default width is narrower than frame | `resize_node` to frame width after creation |
-| Nav bar labels squished | Using Horizontal items variant | Always use "Vertical items" (`58016:37259`) — never Horizontal |
+| Nav bar labels squished | Using wrong variant for screen size | Check design system notes for phone vs tablet variants |
 | List items overlapping | Spacing based on assumed height | Measure actual height, then add gap |
 | Components clipped at edges | Placed without checking actual width | Measure width, adjust position |
 | Buttons outside card bounds | Card height set arbitrarily | Let auto-layout size the card, or measure content first |
-| Nav bar wrong tab active | M3 nav always activates item 1 | Use `get_instance_properties` then `set_instance_properties` with `"Selected": "True"/"False"` |
+| Nav bar wrong tab active | Nav bar activates item 1 by default | Use `get_instance_properties` then `set_instance_properties` to toggle the active state |
 | Font loading error | Using Inter Medium or other weights | Use `fontStyle: "Regular"` only |
 | Elements appear unchanged | Modified vector inside instance instead of instance itself | Use `set_properties` on the INSTANCE node |

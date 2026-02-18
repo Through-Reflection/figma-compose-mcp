@@ -27,7 +27,7 @@ Use `get_metadata` on the root page to understand how the design kit is organize
 get_metadata({ nodeId: "0:1" })
 ```
 
-For large design kits (like M3 with 33 pages), this gives you page names and IDs. Record the page structure — components are typically organized by category (Buttons, Cards, Navigation, etc.).
+For large design kits (e.g., 30+ pages), this gives you page names and IDs. Record the page structure — components are typically organized by category (Buttons, Cards, Navigation, etc.).
 
 ### Step 2: Extract color tokens
 
@@ -174,7 +174,7 @@ Combine everything into a single structured file:
 ```json
 {
   "meta": {
-    "source": "Material 3 Design Kit",
+    "source": "<design system name>",
     "extractedFrom": "<figma file name>",
     "date": "2026-02-01"
   },
@@ -195,7 +195,7 @@ Combine everything into a single structured file:
 
 ### Rule 1: Filter style extraction to avoid token overflow
 
-Never call `get_local_styles` without a `nameContains` filter on large design systems. The M3 kit has hundreds of paint styles — fetching all at once produces output that exceeds context limits.
+Never call `get_local_styles` without a `nameContains` filter on large design systems. Large kits can have hundreds of paint styles — fetching all at once produces output that exceeds context limits.
 
 Break extraction into themed batches: `sys/light`, `sys/dark`, `ref/primary`, `ref/neutral`, etc.
 
